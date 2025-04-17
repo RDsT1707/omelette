@@ -115,3 +115,105 @@ class Bol {
 }
 
 // Création des objets : lieux, outils, ingrédients, et personnage
+let maison = new Lieu("maison");
+let epicerie = new Lieu("épicerie");
+let couteau = new Outil("couteau", "couper");
+let mouleur = new Outil("mouleur", "moudre");
+let poele = new Poele("poêle");
+let bol = new Bol();
+
+let oignon = new Ingredient("oignon", "entier", 2);
+let oeuf = new Ingredient("oeuf", "entier", 4);
+let epice = new Ingredient("epice", "moulu", 3.25);
+let fromage = new Ingredient("fromage", "coupé", 1.6);
+
+let rayan = new Personnage("Rayan", maison, 20);  // Création de Rayan
+maison.personnes.push(rayan);  // Rayan est dans la maison
+
+// Ajout des ingrédients à l'épicerie
+epicerie.ingredients = [oignon, oeuf, epice, fromage];
+// Création des paniers à l'épicerie
+epicerie.paniers = [
+    { type: "panier", contenu: [] },
+    { type: "panier", contenu: [] }
+];
+
+epicerie.personnes.push(rayan);  // Rayan est aussi dans l'épicerie
+maison.personnes.push(rayan);  // Il est aussi dans la maison
+
+// Affiche où est Rayan
+console.log(rayan.nom + " est actuellement à la " + rayan.lieu.nom + ".");
+
+// **Rayan se déplace vers l'épicerie**
+rayan.seDeplacer(epicerie);
+console.log(rayan.nom + " est actuellement à la " + rayan.lieu.nom + ".");
+
+// **Il prend les ingrédients de l'épicerie**
+epicerie.ingredients.forEach(ingredient => {
+    console.log(`${rayan.nom} prend un ${ingredient.nom} et le met dans le panier.`);
+    rayan.mainDroite[0].contenu.push(ingredient);  // Met les ingrédients dans son panier
+});
+
+// **Passage en caisse**
+console.log("\n--- Passage en caisse ---\n");
+rayan.mainDroite[0].contenu.forEach(ingredient => {
+    rayan.payerArticle(ingredient);  // Rayan paye chaque ingrédient
+});
+
+// **Retour à la maison**
+rayan.seDeplacer(maison);
+console.log(rayan.nom + " est rentré à la " + rayan.lieu.nom + ".");
+
+// **Mettre les ingrédients dans le bol**
+rayan.mainDroite[0].contenu.forEach(ingredient => {
+    // Enlève l'ingrédient du panier à l'épicerie
+    epicerie.paniers[0].contenu = epicerie.paniers[0].contenu.filter(item => item !== ingredient);
+
+    bol.contenu.push(ingredient);  // Met l'ingrédient dans le bol
+    console.log(`${rayan.nom} met ${ingredient.nom} dans le bol.`);
+});
+
+// Affiche ce qu'il reste dans le panier et ce qui est dans le bol
+console.log("\nIngrédients restant dans le panier :", epicerie.paniers[0].contenu);
+console.log("\nIngrédients dans le bol :", bol.contenu);
+
+// **Retourner à l'épicerie pour rendre le panier**
+rayan.seDeplacer(epicerie);
+console.log(rayan.nom + " est actuellement à la " + rayan.lieu.nom + ".");
+
+// **Retourner à la maison après avoir rendu le panier**
+rayan.seDeplacer(maison);
+console.log(rayan.nom + " est rentré à la " + rayan.lieu.nom + ".");
+
+
+// Verifier les ingredient entier et les couper avec la methode 
+
+// Vérifie chaque ingrédient dans le bol et le coupe seulement s'il est entier
+bol.contenu.forEach(ingredient => {
+    if (ingredient.etat === "entier") {
+        rayan.couper(ingredient, couteau);  // Si l'ingrédient est entier, Rayan peut le couper
+    } else {
+        console.log(`${ingredient.nom} est déjà ${ingredient.etat}, il ne peut pas être coupé.`);  // Sinon, il ne peut pas être coupé
+    }
+});
+
+// Affiche l'état des ingrédients après la coupe
+console.log("Ingrédients après vérification et coupé : ", bol.contenu);
+
+bol.melanger("omelette");  // Mélange les ingrédients et donne le nom "omelette"
+console.log("Mélange effectué, l'omelette est prête à cuire.");
+
+// Vider le bol dans la poêle, il ne doit plus rien avoir dans le bol
+poele.contenu.push(bol.contenu[0]);  // Met le mélange (omelette) dans la poêle
+bol.contenu = [];  // Vide le bol
+
+console.log("Le contenu du bol a été mis dans la poêle.");
+
+// Cuire l'omelette avec la méthode de la poêle
+poele.cuire();  // La cuisson se fait ici, avec un message après un délai
+
+// Affiche un message final une fois l'omelette cuite
+setTimeout(() => {
+    console.log("Notre omelette est cuite :)");
+}, 5000);  // Attendre 5 secondes pour simuler la cuisson de l'omelette
+
